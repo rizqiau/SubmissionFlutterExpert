@@ -6,13 +6,22 @@ import 'package:sqflite/sqflite.dart';
 
 class DatabaseHelper {
   static DatabaseHelper? _databaseHelper;
-  DatabaseHelper._instance() {
+  final bool useInMemoryDb;
+
+  DatabaseHelper._instance({this.useInMemoryDb = false}) {
     _databaseHelper = this;
   }
 
-  factory DatabaseHelper() => _databaseHelper ?? DatabaseHelper._instance();
+  factory DatabaseHelper({bool useInMemoryDb = false}) =>
+      _databaseHelper ?? DatabaseHelper._instance(useInMemoryDb: useInMemoryDb);
 
   static Database? _database;
+
+  static void clearInstance() {
+    _databaseHelper = null;
+    _database?.close(); // Tutup database lama jika ada
+    _database = null;
+  }
 
   Future<Database?> get database async {
     if (_database == null) {
@@ -26,10 +35,14 @@ class DatabaseHelper {
 
   Future<Database> _initDb() async {
     final path = await getDatabasesPath();
-    final databasePath = '$path/ditonton.db';
+    final databasePath =
+        useInMemoryDb ? inMemoryDatabasePath : '$path/ditonton.db';
 
-    var db = await openDatabase(databasePath, version: 2, onCreate: _onCreate);
-    return db;
+    return await openDatabase(
+      databasePath,
+      version: 2,
+      onCreate: _onCreate,
+    );
   }
 
   void _onCreate(Database db, int version) async {
@@ -94,7 +107,7 @@ class DatabaseHelper {
     return await db!.insert(_tblWatchlistTv, tv.toJson());
   }
 
-  Future<int> RemoveWatchlistTv(TvTable tv) async {
+  Future<int> removeWatchlistTv(TvTable tv) async {
     final db = await database;
     return await db!.delete(
       _tblWatchlistTv,
@@ -118,7 +131,7 @@ class DatabaseHelper {
     }
   }
 
-  Future<List<Map<String, dynamic>>> GetWatchlistTv() async {
+  Future<List<Map<String, dynamic>>> getWatchlistTv() async {
     final db = await database;
     final List<Map<String, dynamic>> results = await db!.query(_tblWatchlistTv);
 

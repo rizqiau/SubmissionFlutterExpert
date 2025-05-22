@@ -17,6 +17,20 @@ class TvTable extends Equatable {
     required this.overview,
   });
 
+  TvTable copyWith({
+    int? id,
+    String? originalName,
+    String? overview,
+    String? posterPath,
+  }) {
+    return TvTable(
+      id: id ?? this.id,
+      originalName: originalName ?? this.originalName,
+      overview: overview ?? this.overview,
+      posterPath: posterPath ?? this.posterPath,
+    );
+  }
+
   factory TvTable.fromEntity(TvDetail tv) => TvTable(
         id: tv.id,
         originalName: tv.originalName,

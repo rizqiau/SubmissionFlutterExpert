@@ -49,12 +49,22 @@ runTests() {
 
 runReport() {
   if [ -f "coverage/test.info" ] && ! [ "$TRAVIS" ]; then
-    genhtml coverage/test.info -o coverage --no-function-coverage --prefix $(pwd)
+    # Define the genhtml path for Windows (assuming Chocolatey installation)
+    # Convert C:\ProgramData\chocolatey\lib\lcov\tools\bin\genhtml to /c/ProgramData/chocolatey/lib/lcov/tools/bin/genhtml
+    GENHTML_BIN_PATH="/c/ProgramData/chocolatey/lib/lcov/tools/bin/genhtml"
+
+    # Execute genhtml using its full, Unix-style path
+    "${GENHTML_BIN_PATH}" coverage/test.info -o coverage --no-function-coverage --prefix "$(pwd)"
 
     if [ "$(uname)" == "Darwin" ]; then
       open coverage/index.html
     else
-      start coverage/index.html
+      # Use cmd /c start for Windows to reliably open the HTML file
+      if [ "$(uname)" == "MINGW64_NT-10.0" ] || [ "$(uname)" == "MSYS_NT-10.0" ]; then
+        cmd /c start coverage/index.html
+      else
+        start coverage/index.html
+      fi
     fi
   fi
 }

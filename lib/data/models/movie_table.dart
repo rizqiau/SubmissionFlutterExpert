@@ -15,6 +15,20 @@ class MovieTable extends Equatable {
     required this.overview,
   });
 
+  MovieTable copyWith({
+    int? id,
+    String? title,
+    String? overview,
+    String? posterPath,
+  }) {
+    return MovieTable(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      overview: overview ?? this.overview,
+      posterPath: posterPath ?? this.posterPath,
+    );
+  }
+
   factory MovieTable.fromEntity(MovieDetail movie) => MovieTable(
         id: movie.id,
         title: movie.title,

@@ -1,0 +1,24 @@
+{
+  "page": 1,
+  "results": [
+    {
+      "backdrop_path": "/rCaeldcqxWU4BRaZHyrr9gU2qig.jpg",
+      "id": 12875,
+      "name": "The Dean Martin Show",
+      "original_name": "The Dean Martin Show",
+      "overview": "The Dean Martin Show, also known as The Dean Martin Variety Show, is a TV variety-comedy series that ran from 1965 to 1974 for 264 episodes. It was broadcast by NBC and hosted by entertainer Dean Martin. The theme song to the series was his 1964 hit \"Everybody Loves Somebody.\"",
+      "poster_path": "/gOxZ92eL4Eyn61297yw8cLSMnWH.jpg",
+      "media_type": "tv",
+      "adult": false,
+      "original_language": "en",
+      "genre_ids": [35],
+      "popularity": 29.9204,
+      "first_air_date": "1965-09-16",
+      "vote_average": 7.316,
+      "vote_count": 19,
+      "origin_country": ["US"]
+    }
+  ],
+  "total_pages": 2,
+  "total_results": 40
+}

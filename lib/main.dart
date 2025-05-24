@@ -1,30 +1,7 @@
-import 'package:ditonton/common/constants.dart';
-import 'package:ditonton/common/utils.dart';
-import 'package:ditonton/presentation/pages/about_page.dart';
-import 'package:ditonton/presentation/pages/movies/movie_detail_page.dart';
-import 'package:ditonton/presentation/pages/home_movie_page.dart';
-import 'package:ditonton/presentation/pages/movies/popular_movies_page.dart';
-import 'package:ditonton/presentation/pages/movies/search_page.dart';
-import 'package:ditonton/presentation/pages/movies/top_rated_movies_page.dart';
-import 'package:ditonton/presentation/pages/movies/watchlist_movies_page.dart';
-import 'package:ditonton/presentation/pages/tv/home_tv_page.dart';
-import 'package:ditonton/presentation/pages/tv/popular_tv_page.dart';
-import 'package:ditonton/presentation/pages/tv/top_rated_tv_page.dart';
-import 'package:ditonton/presentation/pages/tv/tv_detail_page.dart';
-import 'package:ditonton/presentation/pages/tv/tv_search_page.dart';
-import 'package:ditonton/presentation/pages/tv/watchlist_tv_page.dart';
-import 'package:ditonton/presentation/provider/movies/movie_detail_notifier.dart';
-import 'package:ditonton/presentation/provider/movies/movie_list_notifier.dart';
-import 'package:ditonton/presentation/provider/movies/movie_search_notifier.dart';
-import 'package:ditonton/presentation/provider/movies/popular_movies_notifier.dart';
-import 'package:ditonton/presentation/provider/movies/top_rated_movies_notifier.dart';
-import 'package:ditonton/presentation/provider/movies/watchlist_movie_notifier.dart';
-import 'package:ditonton/presentation/provider/tv/popular_tv_notifier.dart';
-import 'package:ditonton/presentation/provider/tv/top_rated_tv_notifier.dart';
-import 'package:ditonton/presentation/provider/tv/tv_detail_notifier.dart';
-import 'package:ditonton/presentation/provider/tv/tv_list_notifier.dart';
-import 'package:ditonton/presentation/provider/tv/tv_search_notifier.dart';
-import 'package:ditonton/presentation/provider/tv/watchlist_tv_notifier.dart';
+import 'package:core/core.dart';
+import 'package:movies/movies.dart';
+import 'package:tv/tv.dart';
+import 'package:about/about_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -85,7 +62,7 @@ class MyApp extends StatelessWidget {
           primaryColor: kRichBlack,
           scaffoldBackgroundColor: kRichBlack,
           textTheme: kTextTheme,
-          drawerTheme: kDrawerTheme,
+          drawerTheme: DrawerThemeData(),
         ),
         home: HomeMoviePage(),
         navigatorObservers: [routeObserver],

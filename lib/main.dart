@@ -1,4 +1,6 @@
 import 'package:core/core.dart';
+import 'package:ditonton/firebase_options.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:movies/movies.dart';
 import 'package:tv/tv.dart';
 import 'package:about/about_page.dart';
@@ -9,6 +11,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   await di.init();
   runApp(MyApp());

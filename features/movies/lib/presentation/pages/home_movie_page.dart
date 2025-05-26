@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:core/core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:movies/movies.dart';
 import 'package:about/about.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -57,6 +58,7 @@ class _HomeMoviePageState extends State<HomeMoviePage> {
               leading: Icon(Icons.save_alt),
               title: Text('Watchlist Movies'),
               onTap: () {
+                FirebaseCrashlytics.instance.crash();
                 Navigator.pushNamed(context, WatchlistMoviesPage.ROUTE_NAME);
               },
             ),

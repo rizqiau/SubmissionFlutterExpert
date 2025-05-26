@@ -6,8 +6,8 @@ import 'package:movies/movies.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 
-import '../../../test/dummy_data/dummy_objects.dart';
-import '../../../test/helpers/test_helper.mocks.dart';
+import '../../dummy_data/dummy_objects.dart';
+import '../../helpers/test_helper.mocks.dart';
 
 void main() {
   late MovieRepositoryImpl repository;
@@ -289,7 +289,8 @@ void main() {
     final tMovieList = <MovieModel>[];
     final tId = 1;
 
-    test('should return data (movie list) when the call is successful', () async {
+    test('should return data (movie list) when the call is successful',
+        () async {
       // arrange
       when(
         mockRemoteDataSource.getMovieRecommendations(tId),

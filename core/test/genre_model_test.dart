@@ -1,6 +1,4 @@
-import 'dart:convert';
-
-import '../lib/data/models/genre_model.dart';
+import 'package:core/core.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

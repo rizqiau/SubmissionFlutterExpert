@@ -6,8 +6,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:mockito/mockito.dart';
 
-import '../../../test/json_reader.dart';
-import '../../../test/helpers/test_helper.mocks.dart';
+import '../../json_reader.dart';
+import '../../helpers/test_helper.mocks.dart';
 
 void main() {
   const API_KEY = 'api_key=2174d146bb9c0eab47529b2e77d6b526';
@@ -22,10 +22,9 @@ void main() {
   });
 
   group('get Now Playing Movies', () {
-    final tMovieList =
-        MovieResponse.fromJson(
-          json.decode(readJson('dummy_data/now_playing.json')),
-        ).movieList;
+    final tMovieList = MovieResponse.fromJson(
+      json.decode(readJson('dummy_data/now_playing.json')),
+    ).movieList;
 
     test(
       'should return list of Movie Model when the response code is 200',
@@ -60,10 +59,9 @@ void main() {
   });
 
   group('get Popular Movies', () {
-    final tMovieList =
-        MovieResponse.fromJson(
-          json.decode(readJson('dummy_data/popular.json')),
-        ).movieList;
+    final tMovieList = MovieResponse.fromJson(
+      json.decode(readJson('dummy_data/popular.json')),
+    ).movieList;
 
     test(
       'should return list of movies when response is success (200)',
@@ -97,10 +95,9 @@ void main() {
   });
 
   group('get Top Rated Movies', () {
-    final tMovieList =
-        MovieResponse.fromJson(
-          json.decode(readJson('dummy_data/top_rated.json')),
-        ).movieList;
+    final tMovieList = MovieResponse.fromJson(
+      json.decode(readJson('dummy_data/top_rated.json')),
+    ).movieList;
 
     test('should return list of movies when response code is 200 ', () async {
       // arrange
@@ -166,10 +163,9 @@ void main() {
   });
 
   group('get movie recommendations', () {
-    final tMovieList =
-        MovieResponse.fromJson(
-          json.decode(readJson('dummy_data/movie_recommendations.json')),
-        ).movieList;
+    final tMovieList = MovieResponse.fromJson(
+      json.decode(readJson('dummy_data/movie_recommendations.json')),
+    ).movieList;
     final tId = 1;
 
     test(
@@ -211,10 +207,9 @@ void main() {
   });
 
   group('search movies', () {
-    final tSearchResult =
-        MovieResponse.fromJson(
-          json.decode(readJson('dummy_data/search_spiderman_movie.json')),
-        ).movieList;
+    final tSearchResult = MovieResponse.fromJson(
+      json.decode(readJson('dummy_data/search_spiderman_movie.json')),
+    ).movieList;
     final tQuery = 'Spiderman';
 
     test('should return list of movies when response code is 200', () async {

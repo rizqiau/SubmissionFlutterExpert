@@ -3,16 +3,16 @@ import 'package:core/core.dart';
 import 'package:tv/tv.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart'; // Import Bloc
 
 class TvDetailPage extends StatefulWidget {
   static const ROUTE_NAME = '/tv-detail';
 
   final int id;
-  TvDetailPage({required this.id});
+  const TvDetailPage({super.key, required this.id});
 
   @override
-  _TvDetailPageState createState() => _TvDetailPageState();
+  State<TvDetailPage> createState() => _TvDetailPageState();
 }
 
 class _TvDetailPageState extends State<TvDetailPage> {
@@ -20,36 +20,65 @@ class _TvDetailPageState extends State<TvDetailPage> {
   void initState() {
     super.initState();
     Future.microtask(() {
-      Provider.of<TvDetailNotifier>(
-        context,
-        listen: false,
-      ).fetchTvDetail(widget.id);
-      Provider.of<TvDetailNotifier>(
-        context,
-        listen: false,
-      ).loadWatchlistStatus(widget.id);
+      // Mengirim event untuk mengambil detail TV dan rekomendasi
+      context.read<TvDetailBloc>().add(FetchTvDetail(widget.id));
+      // Mengirim event untuk memuat status watchlist
+      context.read<WatchlistTvBloc>().add(LoadWatchlistStatus(widget.id));
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Consumer<TvDetailNotifier>(
-        builder: (context, provider, child) {
-          if (provider.tvState == RequestState.Loading) {
-            return Center(child: CircularProgressIndicator());
-          } else if (provider.tvState == RequestState.Loaded) {
-            final tv = provider.tv;
-            return SafeArea(
-              child: DetailContent(
-                tv,
-                provider.tvRecommendations,
-                provider.isAddedToWatchlist,
-              ),
+      body: BlocConsumer<WatchlistTvBloc, WatchlistTvState>(
+        listener: (context, watchlistState) {
+          // Mendengarkan perubahan state WatchlistTvBloc untuk menampilkan pesan
+          if (watchlistState is WatchlistMessage) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(watchlistState.message)));
+          } else if (watchlistState is WatchlistTvError) {
+            showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(content: Text(watchlistState.message));
+              },
             );
-          } else {
-            return Center(child: Text(provider.message));
           }
+        },
+        builder: (context, watchlistState) {
+          // BlocBuilder untuk TvDetailBloc
+          return BlocBuilder<TvDetailBloc, TvDetailState>(
+            builder: (context, tvDetailState) {
+              if (tvDetailState is TvDetailLoading) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (tvDetailState is TvDetailHasData) {
+                final tv = tvDetailState.tvDetail;
+                final recommendations = tvDetailState.tvRecommendations;
+
+                // Menentukan status isAddedToWatchlist dari WatchlistTvBloc
+                bool isAddedToWatchlist = false;
+                if (watchlistState is WatchlistStatusLoaded) {
+                  isAddedToWatchlist = watchlistState.isAddedToWatchlist;
+                }
+                // Jika ada pesan sukses penambahan/penghapusan, perbarui status
+                else if (watchlistState is WatchlistMessage) {
+                  isAddedToWatchlist =
+                      watchlistState.message ==
+                      WatchlistTvBloc.watchlistAddSuccessMessage;
+                }
+
+                return SafeArea(
+                  child: DetailContent(tv, recommendations, isAddedToWatchlist),
+                );
+              } else if (tvDetailState is TvDetailError) {
+                return Center(child: Text(tvDetailState.message));
+              } else {
+                // State awal atau tidak terduga
+                return const Center(child: Text('Failed to load Tv detail.'));
+              }
+            },
+          );
         },
       ),
     );
@@ -61,7 +90,12 @@ class DetailContent extends StatelessWidget {
   final List<Tv> recommendations;
   final bool isAddedWatchlist;
 
-  DetailContent(this.tv, this.recommendations, this.isAddedWatchlist);
+  const DetailContent(
+    this.tv,
+    this.recommendations,
+    this.isAddedWatchlist, {
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -72,15 +106,16 @@ class DetailContent extends StatelessWidget {
           imageUrl: 'https://image.tmdb.org/t/p/w500${tv.posterPath}',
           width: screenWidth,
           placeholder:
-              (context, url) => Center(child: CircularProgressIndicator()),
-          errorWidget: (context, url, error) => Icon(Icons.error),
+              (context, url) =>
+                  const Center(child: CircularProgressIndicator()),
+          errorWidget: (context, url, error) => const Icon(Icons.error),
         ),
         Container(
           margin: const EdgeInsets.only(top: 48 + 8),
           child: DraggableScrollableSheet(
             builder: (context, scrollController) {
               return Container(
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: kRichBlack,
                   borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
                 ),
@@ -97,7 +132,7 @@ class DetailContent extends StatelessWidget {
                         child: Container(
                           width: 48,
                           height: 4,
-                          margin: EdgeInsets.only(bottom: 16),
+                          margin: const EdgeInsets.only(bottom: 16),
                           decoration: BoxDecoration(
                             color: Colors.grey[300],
                             borderRadius: BorderRadius.circular(2),
@@ -105,35 +140,38 @@ class DetailContent extends StatelessWidget {
                         ),
                       ),
                       Text(tv.name, style: kHeading5),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Text(
                         tv.originalName != tv.name
                             ? 'Original Title: ${tv.originalName}'
                             : '',
-                        style: TextStyle(color: Colors.white70, fontSize: 14),
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 14,
+                        ),
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Row(
                         children: [
                           Chip(
                             label: Text(
                               tv.status,
-                              style: TextStyle(color: Colors.white),
+                              style: const TextStyle(color: Colors.white),
                             ),
                             backgroundColor: Colors.blueGrey,
                           ),
-                          SizedBox(width: 8),
+                          const SizedBox(width: 8),
                           Chip(
                             label: Text(
                               tv.type,
-                              style: TextStyle(color: Colors.white),
+                              style: const TextStyle(color: Colors.white),
                             ),
                             backgroundColor: Colors.teal,
                           ),
-                          SizedBox(width: 8),
+                          const SizedBox(width: 8),
                           if (tv.adult)
                             Chip(
-                              label: Text(
+                              label: const Text(
                                 '18+',
                                 style: TextStyle(color: Colors.white),
                               ),
@@ -141,230 +179,214 @@ class DetailContent extends StatelessWidget {
                             ),
                         ],
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Row(
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.calendar_today,
                             size: 18,
                             color: Colors.white54,
                           ),
-                          SizedBox(width: 4),
+                          const SizedBox(width: 4),
                           Text(
                             'First Air: ${tv.firstAirDate}',
-                            style: TextStyle(color: Colors.white70),
+                            style: const TextStyle(color: Colors.white70),
                           ),
-                          SizedBox(width: 16),
-                          Icon(
+                          const SizedBox(width: 16),
+                          const Icon(
                             Icons.calendar_today_outlined,
                             size: 18,
                             color: Colors.white54,
                           ),
-                          SizedBox(width: 4),
+                          const SizedBox(width: 4),
                           Text(
                             'Last Air: ${tv.lastAirDate}',
-                            style: TextStyle(color: Colors.white70),
+                            style: const TextStyle(color: Colors.white70),
                           ),
                         ],
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Row(
                         children: [
-                          Icon(Icons.language, size: 18, color: Colors.white54),
-                          SizedBox(width: 4),
+                          const Icon(
+                            Icons.language,
+                            size: 18,
+                            color: Colors.white54,
+                          ),
+                          const SizedBox(width: 4),
                           Text(
                             'Languages: ${tv.languages.join(', ')}',
-                            style: TextStyle(color: Colors.white70),
+                            style: const TextStyle(color: Colors.white70),
                           ),
                         ],
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Row(
                         children: [
-                          Icon(Icons.flag, size: 18, color: Colors.white54),
-                          SizedBox(width: 4),
+                          const Icon(
+                            Icons.flag,
+                            size: 18,
+                            color: Colors.white54,
+                          ),
+                          const SizedBox(width: 4),
                           Text(
                             'Country: ${tv.originCountry.join(', ')}',
-                            style: TextStyle(color: Colors.white70),
+                            style: const TextStyle(color: Colors.white70),
                           ),
                         ],
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Row(
                         children: [
-                          Icon(Icons.timer, size: 18, color: Colors.white54),
-                          SizedBox(width: 4),
+                          const Icon(
+                            Icons.timer,
+                            size: 18,
+                            color: Colors.white54,
+                          ),
+                          const SizedBox(width: 4),
                           Text(
                             'Episode Runtime: ${_showDurations(tv.episodeRunTime)}',
-                            style: TextStyle(color: Colors.white70),
+                            style: const TextStyle(color: Colors.white70),
                           ),
                         ],
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Row(
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.confirmation_number,
                             size: 18,
                             color: Colors.white54,
                           ),
-                          SizedBox(width: 4),
+                          const SizedBox(width: 4),
                           Text(
                             'Seasons: ${tv.numberOfSeasons}',
-                            style: TextStyle(color: Colors.white70),
+                            style: const TextStyle(color: Colors.white70),
                           ),
-                          SizedBox(width: 16),
-                          Icon(
+                          const SizedBox(width: 16),
+                          const Icon(
                             Icons.confirmation_number_outlined,
                             size: 18,
                             color: Colors.white54,
                           ),
-                          SizedBox(width: 4),
+                          const SizedBox(width: 4),
                           Text(
                             'Episodes: ${tv.numberOfEpisodes}',
-                            style: TextStyle(color: Colors.white70),
+                            style: const TextStyle(color: Colors.white70),
                           ),
                         ],
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Text(
                         'Genres: ${_showGenres(tv.genres)}',
-                        style: TextStyle(color: Colors.white70),
+                        style: const TextStyle(color: Colors.white70),
                       ),
-                      SizedBox(height: 16),
+                      const SizedBox(height: 16),
                       Row(
                         children: [
                           RatingBarIndicator(
                             rating: tv.voteAverage / 2,
                             itemCount: 5,
                             itemBuilder:
-                                (context, index) =>
-                                    Icon(Icons.star, color: kMikadoYellow),
+                                (context, index) => const Icon(
+                                  Icons.star,
+                                  color: kMikadoYellow,
+                                ),
                             itemSize: 24,
                           ),
-                          SizedBox(width: 8),
+                          const SizedBox(width: 8),
                           Text(
                             '${tv.voteAverage} (${tv.voteCount} votes)',
-                            style: TextStyle(color: Colors.white70),
+                            style: const TextStyle(color: Colors.white70),
                           ),
                         ],
                       ),
-                      SizedBox(height: 16),
+                      const SizedBox(height: 16),
                       FilledButton(
                         onPressed: () async {
                           if (!isAddedWatchlist) {
-                            await Provider.of<TvDetailNotifier>(
-                              context,
-                              listen: false,
-                            ).addWatchlist(tv);
+                            context.read<WatchlistTvBloc>().add(
+                              AddWatchlist(tv),
+                            );
                           } else {
-                            await Provider.of<TvDetailNotifier>(
-                              context,
-                              listen: false,
-                            ).removeFromWatchlist(tv);
-                          }
-                          final message =
-                              Provider.of<TvDetailNotifier>(
-                                context,
-                                listen: false,
-                              ).watchlistMessage;
-                          if (message ==
-                                  TvDetailNotifier.watchlistAddSuccessMessage ||
-                              message ==
-                                  TvDetailNotifier
-                                      .watchlistRemoveSuccessMessage) {
-                            ScaffoldMessenger.of(
-                              context,
-                            ).showSnackBar(SnackBar(content: Text(message)));
-                          } else {
-                            showDialog(
-                              context: context,
-                              builder: (context) {
-                                return AlertDialog(content: Text(message));
-                              },
+                            context.read<WatchlistTvBloc>().add(
+                              RemoveWatchlistTvs(tv),
                             );
                           }
+                          // Pesan akan ditangani oleh BlocConsumer di TvDetailPage
                         },
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             isAddedWatchlist
-                                ? Icon(Icons.check)
-                                : Icon(Icons.add),
-                            SizedBox(width: 4),
-                            Text('Watchlist'),
+                                ? const Icon(Icons.check)
+                                : const Icon(Icons.add),
+                            const SizedBox(width: 4),
+                            const Text('Watchlist'),
                           ],
                         ),
                       ),
-                      SizedBox(height: 16),
+                      const SizedBox(height: 16),
                       Text('Overview', style: kHeading6),
-                      SizedBox(height: 4),
-                      Text(tv.overview, style: TextStyle(color: Colors.white)),
-                      SizedBox(height: 16),
+                      const SizedBox(height: 4),
+                      Text(
+                        tv.overview,
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      const SizedBox(height: 16),
                       Text(
                         'Popularity: ${tv.popularity}',
-                        style: TextStyle(color: Colors.white70),
+                        style: const TextStyle(color: Colors.white70),
                       ),
-                      SizedBox(height: 16),
+                      const SizedBox(height: 16),
                       Text('Recommendations', style: kHeading6),
-                      SizedBox(height: 8),
-                      Consumer<TvDetailNotifier>(
-                        builder: (context, data, child) {
-                          if (data.recommendationState ==
-                              RequestState.Loading) {
-                            return Center(child: CircularProgressIndicator());
-                          } else if (data.recommendationState ==
-                              RequestState.Error) {
-                            return Text(data.message);
-                          } else if (data.recommendationState ==
-                              RequestState.Loaded) {
-                            return Container(
-                              height: 150,
-                              child: ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: recommendations.length,
-                                itemBuilder: (context, index) {
-                                  final tv = recommendations[index];
-                                  return Padding(
-                                    padding: const EdgeInsets.all(4.0),
-                                    child: InkWell(
-                                      onTap: () {
-                                        Navigator.pushReplacementNamed(
-                                          context,
-                                          TvDetailPage.ROUTE_NAME,
-                                          arguments: tv.id,
-                                        );
-                                      },
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.all(
-                                          Radius.circular(8),
-                                        ),
-                                        child: CachedNetworkImage(
-                                          imageUrl:
-                                              'https://image.tmdb.org/t/p/w500${tv.posterPath}',
-                                          width: 100,
-                                          fit: BoxFit.cover,
-                                          placeholder:
-                                              (context, url) => Center(
-                                                child:
-                                                    CircularProgressIndicator(),
-                                              ),
-                                          errorWidget:
-                                              (context, url, error) =>
-                                                  Icon(Icons.error),
-                                        ),
+                      const SizedBox(height: 8),
+                      // Langsung menggunakan data rekomendasi yang diterima dari TvDetailPage
+                      recommendations.isEmpty
+                          ? const Text('No recommendations found')
+                          : SizedBox(
+                            height: 150,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: recommendations.length,
+                              itemBuilder: (context, index) {
+                                final tvItem = recommendations[index];
+                                return Padding(
+                                  padding: const EdgeInsets.all(4.0),
+                                  child: InkWell(
+                                    onTap: () {
+                                      // Navigasi ke detail TV baru dengan ID yang berbeda
+                                      Navigator.pushReplacementNamed(
+                                        context,
+                                        TvDetailPage.ROUTE_NAME,
+                                        arguments: tvItem.id,
+                                      );
+                                    },
+                                    child: ClipRRect(
+                                      borderRadius: const BorderRadius.all(
+                                        Radius.circular(8),
+                                      ),
+                                      child: CachedNetworkImage(
+                                        imageUrl:
+                                            'https://image.tmdb.org/t/p/w500${tvItem.posterPath}',
+                                        width: 100,
+                                        fit: BoxFit.cover,
+                                        placeholder:
+                                            (context, url) => const Center(
+                                              child:
+                                                  CircularProgressIndicator(),
+                                            ),
+                                        errorWidget:
+                                            (context, url, error) =>
+                                                const Icon(Icons.error),
                                       ),
                                     ),
-                                  );
-                                },
-                              ),
-                            );
-                          } else {
-                            return Container();
-                          }
-                        },
-                      ),
-                      SizedBox(height: 24),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                      const SizedBox(height: 24),
                     ],
                   ),
                 ),
@@ -379,7 +401,7 @@ class DetailContent extends StatelessWidget {
             backgroundColor: kRichBlack,
             foregroundColor: Colors.white,
             child: IconButton(
-              icon: Icon(Icons.arrow_back),
+              icon: const Icon(Icons.arrow_back),
               onPressed: () {
                 Navigator.pop(context);
               },

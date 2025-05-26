@@ -1,4 +1,4 @@
-import '../../../lib/domain/usecases/get_watchlist_status_tv.dart';
+import 'package:tv/tv.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 

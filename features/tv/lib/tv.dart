@@ -38,12 +38,26 @@ export 'presentation/pages/top_rated_tv_page.dart';
 export 'presentation/pages/tv_detail_page.dart';
 export 'presentation/pages/tv_search_page.dart';
 export 'presentation/pages/watchlist_tv_page.dart';
-// provider
-export 'presentation/provider/popular_tv_notifier.dart';
-export 'presentation/provider/top_rated_tv_notifier.dart';
-export 'presentation/provider/tv_detail_notifier.dart';
-export 'presentation/provider/tv_list_notifier.dart';
-export 'presentation/provider/tv_search_notifier.dart';
-export 'presentation/provider/watchlist_tv_notifier.dart';
+
+// bloc
+export 'presentation/bloc/on_the_air_tv/on_the_air_tv_bloc.dart';
+export 'presentation/bloc/on_the_air_tv/on_the_air_tv_event.dart';
+export 'presentation/bloc/on_the_air_tv/on_the_air_tv_state.dart';
+export 'presentation/bloc/popular_tv/popular_tv_bloc.dart';
+export 'presentation/bloc/popular_tv/popular_tv_event.dart';
+export 'presentation/bloc/popular_tv/popular_tv_state.dart';
+export 'presentation/bloc/search_tv/search_tv_bloc.dart';
+export 'presentation/bloc/search_tv/search_tv_event.dart';
+export 'presentation/bloc/search_tv/search_tv_state.dart';
+export 'presentation/bloc/top_rated_tv/top_rated_tv_bloc.dart';
+export 'presentation/bloc/top_rated_tv/top_rated_tv_event.dart';
+export 'presentation/bloc/top_rated_tv/top_rated_tv_state.dart';
+export 'presentation/bloc/tv_detail/tv_detail_bloc.dart';
+export 'presentation/bloc/tv_detail/tv_detail_event.dart';
+export 'presentation/bloc/tv_detail/tv_detail_state.dart';
+export 'presentation/bloc/watchlist_tv/watchlist_tv_bloc.dart';
+export 'presentation/bloc/watchlist_tv/watchlist_tv_event.dart';
+export 'presentation/bloc/watchlist_tv/watchlist_tv_state.dart';
+
 // widgets
 export 'presentation/widgets/tv_card_list.dart';

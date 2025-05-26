@@ -1,8 +1,8 @@
-import '../../lib/domain/usecases/get_watchlist_status.dart';
+import 'package:movies/movies.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 
-import '../../test/helpers/test_helper.mocks.dart';
+import '../helpers/test_helper.mocks.dart';
 
 void main() {
   late GetWatchListStatus usecase;

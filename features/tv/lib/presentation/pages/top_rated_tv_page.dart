@@ -1,13 +1,14 @@
-import 'package:core/core.dart';
 import 'package:tv/tv.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class TopRatedTvPage extends StatefulWidget {
   static const ROUTE_NAME = '/top-rated-tv';
 
+  const TopRatedTvPage({Key? key}) : super(key: key);
+
   @override
-  _TopRatedTvPageState createState() => _TopRatedTvPageState();
+  State<TopRatedTvPage> createState() => _TopRatedTvPageState();
 }
 
 class _TopRatedTvPageState extends State<TopRatedTvPage> {
@@ -15,11 +16,7 @@ class _TopRatedTvPageState extends State<TopRatedTvPage> {
   void initState() {
     super.initState();
     Future.microtask(
-      () =>
-          Provider.of<TopRatedTvNotifier>(
-            context,
-            listen: false,
-          ).fetchTopRatedTv(),
+      () => context.read<TopRatedTvBloc>().add(const FetchTopRatedTv()),
     );
   }
 
@@ -29,22 +26,26 @@ class _TopRatedTvPageState extends State<TopRatedTvPage> {
       appBar: AppBar(title: Text('Top Rated TV Series')),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Consumer<TopRatedTvNotifier>(
-          builder: (context, data, child) {
-            if (data.state == RequestState.Loading) {
-              return Center(child: CircularProgressIndicator());
-            } else if (data.state == RequestState.Loaded) {
+        child: BlocBuilder<TopRatedTvBloc, TopRatedTvState>(
+          builder: (context, state) {
+            if (state is TopRatedTvLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is TopRatedTvLoaded) {
               return ListView.builder(
                 itemBuilder: (context, index) {
-                  final tv = data.tv[index];
+                  final tv = state.tv[index];
                   return TvCard(tv);
                 },
-                itemCount: data.tv.length,
+                itemCount: state.tv.length,
+              );
+            } else if (state is TopRatedTvError) {
+              return Center(
+                key: const Key('error_message'),
+                child: Text(state.message),
               );
             } else {
-              return Center(
-                key: Key('error_message'),
-                child: Text(data.message),
+              return const Center(
+                child: Text('Failed to load top rated tv series'),
               );
             }
           },

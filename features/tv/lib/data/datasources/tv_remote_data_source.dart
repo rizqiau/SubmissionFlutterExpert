@@ -1,10 +1,7 @@
 import 'dart:convert';
-
 import 'package:core/core.dart';
 import 'package:http/http.dart' as http;
-import 'package:tv/data/models/tv_detail_model.dart';
-import 'package:tv/data/models/tv_model.dart';
-import 'package:tv/data/models/tv_response.dart';
+import 'package:tv/tv.dart';
 
 abstract class TvRemoteDataSource {
   Future<List<TvModel>> getOnTheAirTv();
@@ -25,24 +22,14 @@ class TvRemoteDataSourceImpl implements TvRemoteDataSource {
 
   @override
   Future<List<TvModel>> getOnTheAirTv() async {
-    print('Fetching on the air TV from remote...'); // Debugging
-    try {
-      final response = await client.get(
-        Uri.parse('$BASE_URL/tv/on_the_air?$API_KEY'),
-      );
-      print(
-        'On the air TV response status: ${response.statusCode}',
-      ); // Debugging
-      print('On the air TV response body: ${response.body}'); // Debugging
+    final response = await client.get(
+      Uri.parse('$BASE_URL/tv/on_the_air?$API_KEY'),
+    );
 
-      if (response.statusCode == 200) {
-        return TvResponse.fromJson(json.decode(response.body)).tvList;
-      } else {
-        throw ServerException();
-      }
-    } catch (e) {
-      print('Error fetching on the air TV: $e'); // Debugging
-      rethrow; // Biarkan error tetap diteruskan
+    if (response.statusCode == 200) {
+      return TvResponse.fromJson(json.decode(response.body)).tvList;
+    } else {
+      throw ServerException();
     }
   }
 

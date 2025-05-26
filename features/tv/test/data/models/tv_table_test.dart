@@ -1,5 +1,4 @@
-import '../../../lib/data/models/tv_table.dart';
-import '../../../lib/domain/entities/tv.dart';
+import 'package:tv/tv.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../../movies/test/dummy_data/dummy_objects.dart';

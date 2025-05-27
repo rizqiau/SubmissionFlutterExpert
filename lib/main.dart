@@ -1,6 +1,7 @@
 import 'package:core/core.dart';
 import 'package:ditonton/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:movies/movies.dart';
 import 'package:tv/tv.dart';
 import 'package:about/about_page.dart';
@@ -16,13 +17,21 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  FirebaseAnalytics analytics = FirebaseAnalytics.instance;
+
   await di.init();
-  runApp(MyApp());
+  runApp(MyApp(analytics: analytics));
 }
 
 class MyApp extends StatelessWidget {
+  final FirebaseAnalytics analytics;
+  MyApp({required this.analytics});
+
   @override
   Widget build(BuildContext context) {
+    final FirebaseAnalyticsObserver observer =
+        FirebaseAnalyticsObserver(analytics: analytics);
+
     return MultiBlocProvider(
       providers: [
         // Bloc Movies
@@ -74,7 +83,7 @@ class MyApp extends StatelessWidget {
           drawerTheme: DrawerThemeData(),
         ),
         home: HomeMoviePage(),
-        navigatorObservers: [routeObserver],
+        navigatorObservers: [routeObserver, observer],
         onGenerateRoute: (RouteSettings settings) {
           switch (settings.name) {
             case '/home':

@@ -1,6 +1,6 @@
-import '../lib/data/datasources/db/database_helper.dart';
-import '../../features/movies/lib/data/models/movie_table.dart';
-import '../../features/tv/lib/data/models/tv_table.dart';
+import 'package:movies/movies.dart';
+import 'package:core/core.dart';
+import 'package:tv/tv.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 

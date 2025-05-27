@@ -4,7 +4,6 @@ import 'package:movies/movies.dart';
 import 'package:about/about.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:tv/tv.dart';
 
 class HomeMoviePage extends StatefulWidget {
@@ -44,11 +43,6 @@ class _HomeMoviePageState extends State<HomeMoviePage> {
               leading: Icon(Icons.movie),
               title: Text('Movies'),
               onTap: () {
-                FirebaseAnalytics.instance.logEvent(
-                  name: 'tap_movies',
-                  parameters: {'value': 'movies'},
-                );
-                print('tap_movies');
                 Navigator.pop(context);
               },
             ),
@@ -56,11 +50,6 @@ class _HomeMoviePageState extends State<HomeMoviePage> {
               leading: Icon(Icons.movie),
               title: Text('TV Series'),
               onTap: () {
-                FirebaseAnalytics.instance.logEvent(
-                  name: 'tap_tv_series',
-                  parameters: {'value': 'tv_series'},
-                );
-                print('tap_tv_series');
                 Navigator.pushNamed(context, HomeTvPage.ROUTE_NAME);
               },
             ),

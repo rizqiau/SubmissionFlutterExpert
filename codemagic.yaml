@@ -1,0 +1,66 @@
+# codemagic.yaml untuk Default Workflow
+# Pastikan file ini berada di root repositori Git Anda
+
+workflows:
+  default-workflow: # Sesuaikan: Ini adalah nama workflow yang Anda gunakan ('Default Workflow')
+    name: Default Workflow # Nama tampilan di Codemagic UI
+    instance_type: mac_mini_m1 # Atau sesuaikan dengan tipe instance yang Anda inginkan (misalnya mac_mini_m2, linux_x2_large)
+
+    environment:
+      flutter: stable # Atau versi Flutter spesifik yang Anda gunakan, misal 3.19.6
+      xcode: latest # Hanya relevan jika Anda membangun untuk iOS
+      cocoapods: default # Hanya relevan jika Anda membangun untuk iOS
+
+    triggering:
+      branch_patterns:
+        - pattern: main
+          include: true
+        - pattern: develop
+          include: true
+        # Tambahkan branch lain yang ingin Anda trigger build-nya
+
+    # Skrip sebelum build utama dimulai (termasuk instalasi lcov)
+    scripts:
+      - name: Install lcov
+        script: |
+          echo "Installing lcov..."
+          # Untuk distribusi berbasis Debian/Ubuntu (paling umum di Codemagic)
+          sudo apt-get update
+          sudo apt-get install -y lcov
+
+      - name: Run Flutter Doctor and Get Dependencies
+        script: |
+          echo "Running flutter doctor..."
+          flutter doctor
+
+          echo "Getting Flutter dependencies for all modules..."
+          # Penting untuk monorepo agar semua pubspec.yaml di sub-direktori juga diproses
+          flutter pub get --recursive
+
+      - name: Run custom tests and generate code coverage
+        script: |
+          echo "Running custom multi-module tests and generating code coverage report..."
+          # Pastikan skrip test.sh Anda memiliki izin eksekusi di repo (chmod +x test.sh)
+          chmod +x ./test.sh
+          ./test.sh
+
+    # Bagian PUBLISHING ARTIFACTS
+    # Ini akan mengumpulkan laporan HTML code coverage Anda
+    artifacts:
+      # Jika Anda juga membangun APK/IPA, tambahkan jalur ini:
+      # - build/app/outputs/flutter-apk/app-release.apk
+      # - build/ios/ipa/*.ipa
+
+      # -- Ini adalah baris penting untuk Code Coverage Report --
+      - coverage_report_html # Unggah seluruh folder laporan HTML
+      - coverage_all/combined_lcov.info # Opsional: Unggah juga file lcov.info mentah
+
+    # Konfigurasi notifikasi (opsional)
+    notifications:
+      email:
+        recipients:
+          - mochammadrizqiaullia@gmail.com # Ganti dengan email Anda
+        success: true
+        failure: true
+        started: false
+        cancelled: false

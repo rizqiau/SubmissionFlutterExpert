@@ -44,7 +44,8 @@ workflows:
 
           echo "Getting Flutter dependencies for all modules..."
           # Penting untuk monorepo agar semua pubspec.yaml di sub-direktori juga diproses
-          flutter pub get --recursive
+          # Opsi --recursive sudah tidak diperlukan di Flutter versi baru
+          flutter pub get
 
       - name: Run custom tests and generate code coverage
         script: |

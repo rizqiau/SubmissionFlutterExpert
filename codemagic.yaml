@@ -24,9 +24,18 @@ workflows:
       - name: Install lcov
         script: |
           echo "Installing lcov..."
-          # Untuk distribusi berbasis Debian/Ubuntu (paling umum di Codemagic)
-          sudo apt-get update
-          sudo apt-get install -y lcov
+          # Coba apt-get dulu (untuk Debian/Ubuntu)
+          sudo apt-get update || true # || true untuk mencegah kegagalan jika perintah tidak ditemukan
+          sudo apt-get install -y lcov || true
+
+          # Jika apt-get gagal, coba apk (untuk Alpine Linux)
+          # Perintah || true di atas akan memungkinkan script untuk lanjut ke baris apk
+          apk update || true
+          apk add lcov || true
+
+          # Anda juga bisa menambahkan pesan untuk debugging
+          echo "Verifying lcov installation..."
+          lcov --version || true # Coba jalankan lcov untuk verifikasi
 
       - name: Run Flutter Doctor and Get Dependencies
         script: |

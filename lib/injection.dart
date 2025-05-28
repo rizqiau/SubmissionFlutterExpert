@@ -9,6 +9,7 @@ final locator = GetIt.instance;
 
 Future<void> init() async {
   final client = await SslPinningHelper.client;
+  locator.registerLazySingleton<http.Client>(() => client);
   // bloc
   locator.registerFactory(
     () => NowPlayingMoviesBloc(
@@ -129,7 +130,4 @@ Future<void> init() async {
 
   // helper
   locator.registerLazySingleton<DatabaseHelper>(() => DatabaseHelper());
-
-  // external
-  locator.registerLazySingleton(() => http.Client());
 }

@@ -54,13 +54,3 @@ workflows:
       # -- Ini adalah baris penting untuk Code Coverage Report --
       - coverage_report_html # Unggah seluruh folder laporan HTML
       - coverage_all/combined_lcov.info # Opsional: Unggah juga file lcov.info mentah
-
-    # Konfigurasi notifikasi (opsional)
-    notifications:
-      email:
-        recipients:
-          - mochammadrizqiaullia@gmail.com # Ganti dengan email Anda
-        success: true
-        failure: true
-        started: false
-        cancelled: false

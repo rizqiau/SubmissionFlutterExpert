@@ -21,6 +21,8 @@ void main() async {
 
   await di.init();
   runApp(MyApp(analytics: analytics));
+
+  FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
 }
 
 class MyApp extends StatelessWidget {
